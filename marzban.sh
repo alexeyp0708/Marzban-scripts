@@ -1101,7 +1101,7 @@ install_command() {
         exit 1
     fi
     up_marzban
-    follow_marzban_logs
+    #follow_marzban_logs
 }
 
 install_yq() {
