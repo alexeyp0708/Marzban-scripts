@@ -593,7 +593,11 @@ backup_command() {
 get_xray_core() {
     identify_the_operating_system_and_architecture
     clear
-    local is_latest="$1"
+    local is_latest=
+    if [ "$1" == "latest" ]
+    then
+        is_latest="$1"
+    fi
     validate_version() {
         local version="$1"
         
