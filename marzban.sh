@@ -596,7 +596,7 @@ get_xray_core() {
     local is_latest=
     if [ "$1" == "latest" ]
     then
-        is_latest="$1"
+        is_latest="yes"
     fi
     validate_version() {
         local version="$1"
