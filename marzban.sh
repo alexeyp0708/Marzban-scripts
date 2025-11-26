@@ -623,7 +623,7 @@ get_xray_core() {
         echo -e "\033[1;31mQ:\033[0m Quit"
         echo -e "\033[1;32m==============================\033[0m"
     }
-    echo "=>$is_latest"
+
     if [ ! -z "$is_latest" ]
     then
         selected_version="$(curl -s "https://api.github.com/repos/XTLS/Xray-core/releases?per_page=1"| grep -oP '"tag_name": "\K(.*?)(?=")')"
@@ -634,6 +634,7 @@ get_xray_core() {
     
         while true; do
             print_menu
+                echo "=>$is_latest"
             read -p "Choose a version to install (1-${#versions[@]}), or press M to enter manually, Q to quit: " choice
             
             if [[ "$choice" =~ ^[1-9][0-9]*$ ]] && [ "$choice" -le "${#versions[@]}" ]; then
