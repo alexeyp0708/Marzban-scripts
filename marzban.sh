@@ -593,7 +593,7 @@ backup_command() {
 get_xray_core() {
     identify_the_operating_system_and_architecture
     clear
-
+    local is_latest="$1"
     validate_version() {
         local version="$1"
         
@@ -619,38 +619,41 @@ get_xray_core() {
         echo -e "\033[1;31mQ:\033[0m Quit"
         echo -e "\033[1;32m==============================\033[0m"
     }
-
-    latest_releases=$(curl -s "https://api.github.com/repos/XTLS/Xray-core/releases?per_page=$LAST_XRAY_CORES")
-
-    versions=($(echo "$latest_releases" | grep -oP '"tag_name": "\K(.*?)(?=")'))
-
-    while true; do
-        print_menu
-        read -p "Choose a version to install (1-${#versions[@]}), or press M to enter manually, Q to quit: " choice
-        
-        if [[ "$choice" =~ ^[1-9][0-9]*$ ]] && [ "$choice" -le "${#versions[@]}" ]; then
-            choice=$((choice - 1))
-            selected_version=${versions[choice]}
-            break
-        elif [ "$choice" == "M" ] || [ "$choice" == "m" ]; then
-            while true; do
-                read -p "Enter the version manually (e.g., v1.2.3): " custom_version
-                if [ "$(validate_version "$custom_version")" == "valid" ]; then
-                    selected_version="$custom_version"
-                    break 2
-                else
-                    echo -e "\033[1;31mInvalid version or version does not exist. Please try again.\033[0m"
-                fi
-            done
-        elif [ "$choice" == "Q" ] || [ "$choice" == "q" ]; then
-            echo -e "\033[1;31mExiting.\033[0m"
-            exit 0
-        else
-            echo -e "\033[1;31mInvalid choice. Please try again.\033[0m"
-            sleep 2
-        fi
-    done
-
+    if [ ! -z "$is_latest" ]
+    then
+        selected_version="$(curl -s "https://api.github.com/repos/XTLS/Xray-core/releases?per_page=1"| grep -oP '"tag_name": "\K(.*?)(?=")')"
+    else 
+        latest_releases=$(curl -s "https://api.github.com/repos/XTLS/Xray-core/releases?per_page=$LAST_XRAY_CORES")
+    
+        versions=($(echo "$latest_releases" | grep -oP '"tag_name": "\K(.*?)(?=")'))
+    
+        while true; do
+            print_menu
+            read -p "Choose a version to install (1-${#versions[@]}), or press M to enter manually, Q to quit: " choice
+            
+            if [[ "$choice" =~ ^[1-9][0-9]*$ ]] && [ "$choice" -le "${#versions[@]}" ]; then
+                choice=$((choice - 1))
+                selected_version=${versions[choice]}
+                break
+            elif [ "$choice" == "M" ] || [ "$choice" == "m" ]; then
+                while true; do
+                    read -p "Enter the version manually (e.g., v1.2.3): " custom_version
+                    if [ "$(validate_version "$custom_version")" == "valid" ]; then
+                        selected_version="$custom_version"
+                        break 2
+                    else
+                        echo -e "\033[1;31mInvalid version or version does not exist. Please try again.\033[0m"
+                    fi
+                done
+            elif [ "$choice" == "Q" ] || [ "$choice" == "q" ]; then
+                echo -e "\033[1;31mExiting.\033[0m"
+                exit 0
+            else
+                echo -e "\033[1;31mInvalid choice. Please try again.\033[0m"
+                sleep 2
+            fi
+        done
+    fi
     echo -e "\033[1;32mSelected version $selected_version for installation.\033[0m"
 
     # Check if the required packages are installed
@@ -682,7 +685,7 @@ get_xray_core() {
 # Function to update the Marzban Main core
 update_core_command() {
     check_running_as_root
-    get_xray_core
+    get_xray_core $1
     # Change the Marzban core
     xray_executable_path="XRAY_EXECUTABLE_PATH=\"/var/lib/marzban/xray-core/xray\""
     
