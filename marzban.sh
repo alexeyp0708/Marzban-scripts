@@ -623,6 +623,7 @@ get_xray_core() {
         echo -e "\033[1;31mQ:\033[0m Quit"
         echo -e "\033[1;32m==============================\033[0m"
     }
+    echo "=>$is_latest"
     if [ ! -z "$is_latest" ]
     then
         selected_version="$(curl -s "https://api.github.com/repos/XTLS/Xray-core/releases?per_page=1"| grep -oP '"tag_name": "\K(.*?)(?=")')"
